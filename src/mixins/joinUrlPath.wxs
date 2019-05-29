@@ -1,0 +1,9 @@
+
+module.exports = {
+    filterImageUrl:function(imageUrl){
+        return 'https://www.qincai2018.cn\\public'+ imageUrl;
+    },
+    strSplit:function(str){
+        return str.split(",");
+    }
+}

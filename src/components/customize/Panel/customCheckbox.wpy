@@ -1,0 +1,85 @@
+<!--  -->
+<template>
+    <view class="custom-container">
+        <lable class="custom-container-lable">{{title}}</lable>
+        <van-checkbox-group class="custom-container-group"  value="{{ result }}" name="{{ cmp_name }}"  @change="checkboxChange">
+            <van-checkbox
+                class="checkbox"
+                wx:for="{{ weeks }}"
+                wx:key="index"
+                name="{{ item }}"
+            >
+            {{ item }}
+            </van-checkbox>
+        </van-checkbox-group>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  export default class Example extends wepy.component {
+    props = {
+        title:{
+            type:String,
+            default:"92优惠日期"
+        },
+        weeks:{
+            type:Array,
+            default:['周一','周二','周三','周四','周五','周六','周日']
+        },
+        cmp_name:{
+            type:String,
+            default:"weekBy92"
+        }
+    };
+
+    data = {
+        result: []
+    };
+
+    components = {};
+
+    methods = {
+        checkboxChange(e){
+            //console.log('发生了change事件',e.detail);
+            this.result = e.detail;
+            this.$emit('customCheckbox',this.result);
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+  }
+</script>
+<style lang='less'>
+    .custom-container{
+        display: flex;
+        padding: 15px;
+        &-lable{
+            font-size: 14px;
+            color:#333;
+            flex-shrink:0;
+        }
+        &-group{
+            padding-left: 20rpx;
+            font-size: 14px;
+            display:flex;
+            flex-wrap:wrap;
+            .van-checkbox__label{
+                margin-left: 0 !important;
+            }
+            .checkbox{
+                padding-left: 20rpx;
+                flex-shrink:0;
+                padding-bottom: 10rpx;
+            }
+        }
+    }
+</style>

@@ -1,0 +1,92 @@
+<!--  -->
+<template>
+    <view class='container'>
+      <van-cell-group>
+        <van-field
+            value="{{ name }}"
+            center
+            clearable
+            label="地址位置"
+            placeholder="点击按钮获取地理位置"
+            border="{{ false }}"
+            error ="{{ name == '' ? true : false }}"
+            use-button-slot
+        >
+            <van-button slot="button" size="small" type="primary" @tap="minxinsTap">获取地理位置</van-button>
+        </van-field>
+        </van-cell-group>
+      <ckb1 @customCheckbox.user="ckbFn1"></ckb1>
+      <ckb2 :title="ckb2_name" @customCheckbox.user="ckbFn2"></ckb2>
+         
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import customCheckbox  from '@/components/customize/Panel/customCheckbox';
+  import minxinsAds from '@/mixins/mixinsAddress.js';
+  export default class report extends wepy.page {
+    config = {
+      navigationBarTitleText: "上报位置",
+    };
+
+    data = {
+        latitude:'',
+        longitude:'',
+        price:0,
+        ckb2_name:'95优惠日期',
+    };
+
+    components = {
+        ckb1:customCheckbox,
+        ckb2:customCheckbox
+    };
+
+    mixins = [minxinsAds]
+
+    methods = {
+        ckbFn1(res,event){
+            console.log('这是子组件自定义事件发出的',res);
+        },
+        ckbFn2(res,event){
+            console.log('这是子组件自定义2事件发出的',res);
+        }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+  }
+</script>
+
+<style lang='less'>
+    .custom-container{
+        display: flex;
+        padding: 15rpx;
+        &-lable{
+            font-size: 14px;
+            color:#333;
+            flex-shrink:0;
+        }
+        &-group{
+            padding-left: 20rpx;
+            font-size: 14px;
+            display:flex;
+            flex-wrap:wrap;
+            .van-checkbox__label{
+                margin-left: 0 !important;
+            }
+            .checkbox{
+                padding-left: 20rpx;
+                flex-shrink:0;
+                padding-bottom: 10rpx;
+            }
+        }
+    }
+</style>

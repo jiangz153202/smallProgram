@@ -1,0 +1,45 @@
+
+
+<template>
+    <swiper 
+        autoplay="2000" 
+        indicator-color="#f8f8f8" 
+        class="swiper">
+        <swiper-item wx:for="{{list}}" wx:key="index">
+            <image src="{{item.imgUrl}}" class="swiper-image" />
+        </swiper-item>
+    </swiper>
+</template>
+<script>
+import wepy from 'wepy';
+export default class Index  extends wepy.component  {
+    data = {
+        list: [
+            {
+            link: "111",
+            imgUrl: "https://dummyimage.com/750x340/e6ac01/fff.png"
+            },
+            {
+            link: "",
+            imgUrl: "http://dummyimage.com/750x340/000/FFF.png"
+            },
+            {
+            link: "",
+            imgUrl: "http://dummyimage.com/750x340/fff/000.png"
+            }
+        ],
+    }
+    // Other properties
+}
+</script>
+<style lang="less" scoped>
+    .swiper{
+        width : 750rpx;
+        height : 340rpx;
+        .swiper-image{
+            width :750rpx;
+            height : 340rpx;
+        }
+    }
+         
+</style>

@@ -1,0 +1,222 @@
+<template>
+  <view class='container'>
+      <view class="head">
+          <view class="head-topItem">
+              <view class="head-userinfo">
+                  <view class="head-images">
+                      <image src="https://dummyimage.com/240x240/e6ac01/fff.png?text=headImage" mode="scaleToFill"
+                        lazy-load="false">
+                      </image>
+                  </view>
+                  <view class="head-context">
+                    <view class="ctx-textarea">
+                      <label>小点__4129<van-tag color="#ffc803">Lv2</van-tag></label>
+                    </view>
+                    <view class="ctx-city">
+                      city
+                    </view>
+                  </view>
+                  <text class="head-link">个人主页》</text>
+              </view>
+             
+          </view>
+          <view class="head-botItem">
+              <view class="card">
+                  <view class="card-panel"> 
+                    <i class='iconfont iconadd-image'></i>
+                    <lable>我的点评名片</lable>
+                    <text>全新升级，彰显身份</text>
+                  </view>
+                  <view class="card-tags">
+                    <label>点评<i>3</i></label>
+                    <label>粉丝<i>13</i></label>
+                    <label>签到<i>5</i></label>
+                  </view>
+                  <view class="card-link">
+                    <view class="link-tag">
+                      <van-icon name="qr" color="#cccccc" size="48rpx"></van-icon>
+                      <van-icon name="arrow" color="#cccccc" size="48rpx"></van-icon>
+                    </view>
+                  </view>
+                  <view class="card-icon">NEW</view>
+              </view>
+          </view>
+      </view>
+      <view class="body">
+          <tabCustom :propDatas="propDatas"></tabCustom>
+          <tabCustom2 :propDatas="propDatas"></tabCustom2>
+      </view>
+      
+  </view>
+</template>
+<style lang="less" scoped>
+    .head{
+      display: flex;
+      flex-direction: column;
+      padding: 30rpx;
+      // box-shadow: inset 1px 1px #c6c6c6;
+      &-topItem{
+        margin-bottom: 30rpx;
+        .head-userinfo{
+          display: flex;
+          flex-direction: wrap;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          image{
+            width: 160rpx;
+            height:160rpx;
+            display: block;
+            border-radius: 4rpx;
+          }
+        }
+        .head-context{
+          color: #000;
+          overflow: hidden;
+          flex: 1;
+          padding: 20rpx;
+          .ctx-textarea{
+            padding-bottom: 20rpx;
+            label{
+              font-size: 36rpx;
+              font-weight: bold;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .lv{
+              background: #ffc803;
+              color: #ffffff;
+            }
+          }
+          .ctx-city{
+            font-size: 28rpx;
+          }
+        }
+        .head-link{
+          font-size: 26rpx;
+          color: #ccc;
+        }
+      }
+      &-botItem{
+        .card{
+          position: relative;
+          border-radius: 10px;
+          box-shadow: 0 0 10rpx #f8f8f8;
+          padding: 30rpx;
+          &-panel{
+            margin-bottom: 20rpx;
+            .iconfont{
+              background: orangered;
+              padding: 0 5rpx;
+            }
+            label{
+              font-size: 30rpx;
+              font-weight: bold;
+            }
+            text{
+              font-size: 24rpx;
+              color: #c6c6c6;
+            }
+          }
+          &-tags{
+            font-size: 28rpx;
+            color:#c6c6c6;
+            label{
+              margin-right: 10rpx;
+              border-right: 1rpx #ccc solid;
+              padding-right: 10rpx;
+            }
+            i{
+              color:#000;
+              margin-left:10rpx;
+
+            }
+          }
+          &-link{
+            position: absolute;
+            right: 20rpx;
+            top:50%;
+            margin-top: -25rpx;
+          }
+          &-icon{
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 24rpx;
+            padding: 4rpx 8rpx;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 4px;
+            color: #ffffff;
+            background: linear-gradient(45deg,rgb(243, 36, 0),#ffc803 50%,#090)
+          }
+        }
+      }
+    }
+    .body{
+      padding: 30rpx;
+      
+    }
+</style>
+
+<script>
+  import wepy from 'wepy';
+  import TabCustom from '@/components/customize/TabCustom/index';
+  export default class userinfo extends wepy.page {
+    config = {
+      navigationBarTitleText: "个人中心",
+    };
+
+    data = {
+      propDatas:{
+        title:'我的订单',
+        size:'50rpx',
+        list:[
+          {
+            isVanIcon:true,
+            icon:"pending-payment",
+            text:"待付款",
+            path:"/pages/user/report"
+          },
+          {
+            isVanIcon:true,
+            icon:"paid",
+            text:"可使用",
+            path:"/pages/user/report"
+          },
+          {
+            isVanIcon:true,
+            icon:"after-sale",
+            text:"退款/售后",
+            path:"/pages/user/report"
+          },
+          {
+            isVanIcon:true,
+            icon:"todo-list",
+            text:"全部订单",
+            path:"/pages/user/report"
+          },
+        ]
+      }
+    };
+
+    components = {
+      tabCustom:TabCustom,
+      tabCustom2:TabCustom
+    };
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+
+  }
+</script>
+

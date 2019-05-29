@@ -1,0 +1,141 @@
+<style lang="less">
+  @import "./assets/styls/iconfont/iconfont.less";
+  
+</style>
+
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+
+
+import 'babel-polyfill';
+
+const wechat = require('./util/wechat.js');
+const envConfig = require('./util/envConfig.js');
+
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/tabbar/location',
+      'pages/tabbar/upload', 
+      'pages/tabbar/address',
+      'pages/user/login',
+      'pages/user/report'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: '优惠加油站分布',
+      navigationBarTextStyle: 'black'
+    },
+    tabBar:{
+      color: "#cccccc",
+      selectedColor: "#ffc803",
+      borderStyle: "white",
+      backgroundColor: "#ffffff",
+      list:[
+        {
+          pagePath:"pages/tabbar/location",
+          text:"油站地址",
+          iconPath:"static/tabbar/jiayouzhan.png",
+          selectedIconPath:"static/tabbar/jiayouzhan_sel.png"
+        },
+        {
+          pagePath:"pages/tabbar/upload",
+          text:"地址上报",
+          iconPath:"static/tabbar/order.png",
+          selectedIconPath:"static/tabbar/order_sel.png"
+        },
+        {
+          pagePath:"pages/tabbar/address",
+          text:"个人中心",
+          iconPath:"static/tabbar/user.png",
+          selectedIconPath:"static/tabbar/user_sel.png"
+        },
+      ]
+    },
+    "usingComponents": {
+      "van-icon": "./components/vant/icon/index",
+      "van-button": "./components/vant/button/index",
+      "van-tab": "./components/vant/tab/index",
+      "van-tag": "./components/vant/tag/index",
+      "van-tabs": "./components/vant/tabs/index",
+      "van-field": "./components/vant/field/index",
+      "van-cell": "./components/vant/cell/index",
+      "van-cell-group": "./components/vant/cell-group/index",
+      "van-checkbox": "./components/vant/checkbox/index",
+      "van-checkbox-group": "./components/vant/checkbox-group/index",
+    },
+    "permission": {
+      "scope.userLocation": {
+        "desc": "我们需要您的地理位置获取离您最近的加油站"
+      }
+    }
+  };
+  globalData = {
+    userInfo: null,
+    apiUrl: 'http://www.qincai2018.cn:3000',
+    systemInfo:null
+  };
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify'); //设置了这个 就全都是promise流了
+  }
+  onLaunch() {
+    //this.getUserInfo();
+    this.getSystemInfo();
+  }
+
+  async getUserInfo() {
+    try {
+      if (this.globalData.userInfo) {
+        console.log(this.globalData,'进来了吗');
+        return this.globalData.userInfo;
+      }
+      let openids = await wechat.getCryptoData();
+      let d =  await wechat.getOpenid(openids)
+      console.log("从后端获取的openid",d.data);
+      let url = 'http://localhost:3000/api/user/register2openid';
+      let { openid } = d.data;
+      let result = await wechat.request(url,{openids:openid},"POST","application/x-www-form-urlencoded");
+      this.globalData.userInfo = result.data.data;
+      //创建新用户 拉取用户信息 合并保存\
+      console.log('查看result',result,this.globalData.userInfo);
+      //if(result.data.code == 10001){
+        //let res =  await wepy.getSetting();
+        // if(!res.authSetting['scope.userInfo']){
+        //   console.log('没有授权 开始请求');
+        //   let res2 = await wepy.authorize({ scope: 'scope.userInfo' })
+        //   //注意拉取用户信息 需要使用button
+        //   let self_userInfo = await wepy.getUserInfo()
+        //   console.log('进来合并');
+        //   let params = Object.assign(result.data.data,self_userInfo.userInfo);
+        //   this.globalData.userInfo = params
+        //   this.update2register(params);
+        // }
+        
+      //}
+     
+    } catch (error) {
+      console.log('错误',error);
+    }
+  }
+
+  update2register(params){
+    let url = 'https://www.qincai2018.cn:3000/api/user/update2register';
+    return wechat.request(url,params,"POST","application/x-www-form-urlencoded");
+  }
+
+  async getSystemInfo(){
+    let systemInfo = await wepy.getSystemInfo();
+    this.globalData.systemInfo = systemInfo;
+    
+    //console.log('系统信息',this.globalData);
+  }
+
+  
+}
+</script>

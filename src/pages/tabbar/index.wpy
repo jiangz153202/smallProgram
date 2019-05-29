@@ -1,0 +1,64 @@
+<style lang="less">
+</style>
+<template>
+  <view class="container">
+    <!-- 轮播图通告 -->
+    <block>
+      <swipes></swipes>
+    </block>
+    <block>
+      <panel :title="dataSource">
+         <view slot="location">
+           <location></location>
+         </view>
+      </panel>
+    </block>
+    <block>
+      <view>
+        测试
+        <i class='iconfont iconadd-image'></i>
+        2
+        <i class="iconfont icondaohang"></i>
+        3
+         <i class="iconfont icondaohang1"></i>
+      </view>
+      <!-- <child :title="parentTitle" :syncTitle.sync="parentTitle" :twoWayTitle="parentTitle"></child> -->
+    </block>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import location from '@/components/customize/Location/Location';
+import swipes from '@/components/customize/Swipe/Swipe';
+import panel  from '@/components/customize/Panel/Panel';
+// import child from '@/components/customize/Location/child';
+export default class Index extends wepy.page {
+  data = {
+    context:null,
+    dataSource:["热映1","demo2"],
+    parentTitle: 'p-title'
+  };
+  components = {
+    "swipes":swipes,
+    "panel":panel,
+    "location":location
+  }
+  computed = {
+  };
+  methods = {
+  };
+  onLoad() {
+    
+  }
+  onShow() {
+  }  
+  onGotUserInfo(e) {
+    console.log(e.detail.errMsg)
+    console.log(e.detail.userInfo)
+    console.log(e.detail.rawData)
+  }
+
+  
+}
+</script>
+

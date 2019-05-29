@@ -1,0 +1,39 @@
+<!--  -->
+<template>
+  <view class='container'>
+      用户登录页
+      <button size="mini" type="defult" form-type="submit" disabled="false"
+        open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
+        获取手机号码
+      </button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  export default class login extends wepy.page {
+    config = {
+      navigationBarTitleText: "用户登录",
+    };
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+
+    getPhoneNumber(e){
+        console.log(e,'获取客户手机号码')
+    }
+  }
+</script>

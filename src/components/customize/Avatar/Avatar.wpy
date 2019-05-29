@@ -1,0 +1,211 @@
+<!--  -->
+<template>
+    <view class="">
+        <view class="images_data">
+            <image
+                src="/static/utils/uploader.png"
+                class="fisrt-logo"
+                mode="scaleToFill"
+                lazy-load="false"
+                @tap="bindupload"
+            >
+            </image>
+            <repeat for="{{image_list}}" key="index" index="index" item="item">
+                <image src="{{item}}" class="mode-image" lazy-load="false"> </image>
+            </repeat>
+        </view>
+        <canvas
+            canvas-id="firstCanvas"
+            style="width:{{ imgWidth }}px;height:{{ imgHeight }}px;position:absolute;top:{{ -imgHeight }}px;left:{{ -imgWidth }}px"
+        ></canvas>
+    </view>
+</template>
+<style lang="less" scoped>
+.images_data {
+  display: flex;
+  flex-wrap: wrap;
+  .fisrt-logo {
+    padding: 30rpx;
+    width: 190rpx;
+    height: 190rpx;
+    flex-shrink: 0;
+    box-shadow: 1px 1px #f6f6f6;
+    border-top: 1px solid #f6f6f6;
+  }
+  .mode-image {
+    width: 230rpx;
+    height: 230rpx;
+    flex-shrink: 0;
+    padding: 10rpx;
+    box-shadow: 1px 1px #f6f6f6;
+    border-top: 1px solid #f6f6f6;
+  }
+}
+</style>
+
+<script>
+import wepy from 'wepy';
+export default class Example extends wepy.component {
+  props = {
+    isAvatar: Boolean
+  };
+
+  data = {
+    image_list: [],
+    imgWidth: 0,
+    imgHeight: 0,
+    canvasId: 'firstCanvas'
+  };
+
+  components = {};
+
+  onLoad() {
+    console.log(this.isAvatar); // p-title
+  }
+
+  methods = {
+    
+    async bindupload() {
+      let res = await wepy.chooseImage({
+        count: '9', //最多可以选择的图片张数,
+        sizeType: 'compressed'
+      });
+      let self = this;
+      this.image_list = res.tempFilePaths;
+      //this.$apply();
+      let result_array_imgs = [];
+      for (let index = 0; index < this.image_list.length; index++) {
+        let showTitleData = {
+          title: '默认', //提示的内容,
+          icon: 'loading', //图标,
+          duration: 3000,
+          mask: true //显示透明蒙层，防止触摸穿透,
+        };
+        //提示
+        let obj = { title: `上传中,${index + 1}/${this.image_list.length}` };
+
+        await wepy.showToast({ ...obj, showTitleData });
+
+        const filePath = this.image_list[index];
+        let resToTempFile = filePath;
+
+        if (this.isAvatar) {
+          console.log('进入缩略图模式');
+          resToTempFile = await this.onSavePicToCanvas(filePath);
+        }
+
+        let upload_res = await wepy.uploadFile({
+          url: wepy.$instance.globalData.apiUrl + '/upload/files', //开发者服务器 url
+          filePath: resToTempFile, //要上传文件资源的路径
+          name: 'file' //文件对应的 key , 开发者在服务器端通过这个 key 可以获取到文件二进制内容
+        });
+        // console.log(upload_res);
+        upload_res = JSON.parse(upload_res.data);
+        if (upload_res) {
+          let result = index + 1;
+          let obj = { title: `上传中,${result}/${this.image_list.length}` };
+          await wepy.showToast({ ...obj, showTitleData });
+        }
+
+        result_array_imgs.push(upload_res.data);
+
+        if (index == this.image_list.length - 1) {
+          console.log('=========加载完成============');
+          wepy.hideToast();
+          //加载完成 返回事件
+          //设置自定义事件,返回成功数组
+          this.$emit('onUploadEnd', result_array_imgs);
+        }
+      }
+      console.log('结果', result_array_imgs);
+    }
+  };
+  
+  onSavePicToCanvas(imagePath) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let ImageInfo = await wepy.getImageInfo({
+          src: imagePath //图片的路径，可以是相对路径，临时文件路径，存储文件路径，网络图片路径,
+        });
+        //console.log('ImageInfo',ImageInfo);
+        //图片原始尺寸
+        let originWidth = ImageInfo.width;
+        let originHeight = ImageInfo.height;
+        //最大尺寸限制，可以通过限制宽高来实现
+        let {
+          windowWidth,
+          windowHeight
+        } = wepy.$instance.globalData.systemInfo;
+        //console.log(wepy.$instance.globalData.systemInfo);
+        let maxWidth = originWidth || windowWidth,
+          maxHeight = originHeight || windowHeight;
+        //console.log(windowWidth,windowHeight);
+        // 目标尺寸
+        let targetWidth = originWidth,
+          targetHeight = originHeight;
+        // 图片尺寸超过200x150的限制
+        //   if(originWidth > maxWidth || originHeight > maxHeight) {
+        //       if(originWidth / originHeight > maxWidth / maxHeight) {
+        //           // 更宽，按照宽度限定尺寸
+        //           targetWidth = maxWidth;
+        //           targetHeight = Math.round(maxWidth * (originHeight / originWidth));
+        //       } else {
+        //           targetHeight = maxHeight;
+        //           targetWidth = Math.round(maxHeight * (originWidth / originHeight));
+        //       }
+        //   }
+
+        this.imgWidth = targetWidth;
+        this.imgHeight = targetHeight;
+        this.$apply();
+        console.log(targetWidth, targetWidth);
+        let that = this;
+        const ctx = wx.createCanvasContext(this.canvasId);
+        ctx.drawImage(imagePath, 0, 0, targetWidth, targetHeight);
+        ctx.draw(true, async function() {
+          console.log('等待3S钟',(new Date).toLocaleString());
+          setTimeout(() => {
+            console.log('阻碍完成之后',(new Date).toLocaleString());
+            wx.canvasToTempFilePath({
+              canvasId: that.canvasId,
+              fileType: 'jpg',
+              quality: targetWidth > 1000 ? 0.86 : 1,
+              success: function(res) {
+                console.log('获取canvas路径', res);
+                resolve(res.tempFilePath);
+              },
+              fail: function(e) {
+                console.log('获取canvas失败');
+                reject(e);
+              }
+            });
+          }, 300);
+       
+          
+         
+          
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+  onSavePicToPic(path) {
+    wepy.getSetting({
+      success: async res => {
+        if (!res.authSetting['scope.writePhotosAlbum']) {
+          //如果没有授权保存到相册 那么需要
+          console.log('开始授权');
+          let status = await wepy.authorize({
+            scope: 'scope.writePhotosAlbum'
+          });
+          status &&
+            wepy.saveImageToPhotosAlbum(path).then(res => {
+              console.log('调用成功', res);
+            });
+        }
+      }
+    });
+  }
+}
+</script>

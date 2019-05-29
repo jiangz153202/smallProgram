@@ -1,0 +1,446 @@
+<!--  -->
+<template>
+  <!-- <van-tabs sticky animated swipeable active="{{active}}" @change="onChange" class="global-tabs">
+          <van-tab title="标签 1">
+          </van-tab>
+          <van-tab title="标签 2">内容 2</van-tab>
+          <van-tab title="标签 3">内容 3</van-tab>
+          <van-tab title="标签 4">内容 4</van-tab>
+    </van-tabs>-->
+  <view class="box-flex">
+    <view id="header" class="tabs global-tabs" style="">
+      <!-- <repeat for="{{tabsitems}}" key="index" index="index" item="item">
+        <button class="tab" :class="{'active' : tabsitemsActive == index}" data-index="{{index}}" @tap="tabsTap">{{item}}</button>
+      </repeat> -->
+    </view>
+    <map id="myMap" longitude="{{longitude}}" latitude="{{latitude}}" scale="{{scale}}" markers="{{markers}}" 
+    include-points="{{includePoints}}"  show-location enable-rotate
+    @callouttap="callouttap" @markertap="markertap" @updated="bindupdated" @tap="maptap"
+    >
+     </map>
+    <view class="box">
+      <scroll-view id="myScroll" class="scroll" style="height:{{scrollViewHeight}}px"  scroll-top="{{scrollTop}}" scroll-y scroll-with-animation>
+        <repeat for="{{mapsArrays}}" key="index" index="index" item="item">
+          <view class="flex-custom" @tap="customTap({{index}})">
+            <view class="flex-custom-image">
+              <text>{{item.tags}}</text>
+              <image src="{{utilWxs.filterImageUrl(item.head_images)}}" class="context">
+            </image>
+            </view>
+            <view class="flex-custom-content">
+              <view class="flex-custom-content_icon">
+                <label>92:</label>
+                <view class="context">
+                  <repeat for="{{utilWxs.strSplit(item.number_92[0])}}" key="index" index="index" item="Day92">
+                      <van-tag type="success" class="tag">{{Day92}}</van-tag>
+                  </repeat>
+                </view>
+               </view>
+                <view class="flex-custom-content_icon">
+                  <label>95:</label>
+                  <view class="context">
+                    <repeat for="{{utilWxs.strSplit(item.number_95[0])}}" key="index" index="index" item="Day92">
+                      <van-tag type="success" class="tag">{{Day92}}</van-tag>
+                    </repeat>
+                  </view>
+               </view>
+              <label>{{item.name}}</label>
+              <label class="ads">{{item.address}}</label>
+            </view>
+            <view class="flex-custom-logo">
+              <label class="discount">降<i>{{item.discount / 100}}</i>元</label>
+
+              <i class="iconfont icondaohang1" style="font-size:48rpx;color:#ffc803;"  @tap="openLocationByClick({{index}})"></i>
+              
+            </view>
+          </view>
+        </repeat>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+<style lang='less'>
+  .cover-view {
+    margin-left: 52px;
+    margin-top: 20px;
+    width: 200px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    background-color: #1AAD19;
+    color: #fff;
+  }
+  .tabs {
+    display: flex;
+    justify-content: space-between;
+    padding: 14rpx 0;
+    button::after {
+      border: none;
+    }
+    .tab {
+      border-radius: 88rpx;
+      background: transparent;
+      font-size: 24rpx;
+      padding: 0 28rpx;
+      color: #000;
+      border-width: 0;
+      border: none;
+      border-color: transparent;
+      &.active {
+        background: #ffffff;
+      }
+    }
+  }
+  .box-flex {
+    .box {
+      background: #ffffff;
+      flex: 1;
+      .scroll {
+        height: 100%;
+      }
+      .flex-custom {
+        &:last-child{
+          padding-bottom: 20rpx;
+        }
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: center;
+        padding: 20rpx 0rpx 0rpx 20rpx;
+        box-shadow:0 1rpx #f8f8f8;
+        &-image {
+          position: relative;
+          .context{
+            display: block;
+            width: 160rpx;
+            height: 160rpx;
+          }
+          text{
+            font-size: 26rpx;
+            background: #ffffff;
+            color: #000000;
+            position:absolute;
+            left:-10rpx;
+            top:-10rpx;
+            line-height:40rpx;
+            height:40rpx;
+            box-shadow:inset 20rpx 20rpx #ffc803;
+            border-radius:2px;
+            padding:0 10rpx;
+          }
+          
+        }
+
+        &-content {
+          flex: 0 0 390rpx;
+          font-size: 28rpx;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding-left: 20rpx;
+          &_icon{
+            display: flex;
+            flex-direction:row;
+            lable{
+              font-size: 24rpx;
+              flex: 1;
+            }
+            .tag{
+              margin-left: 5rpx;
+            }
+          }
+          .ads{
+            color:#c6c6c6;
+            margin-top: 10rpx;
+            font-size: 24rpx;
+          }
+        }
+        &-logo {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          // justify-content: center; 控制上下位置
+          align-items: center;
+          .discount{
+            font-size: 28rpx;
+            margin-bottom: 10rpx;
+            color:#07c160;
+            i{
+              font-size: 42rpx;
+              font-weight: bold;
+            }
+          }
+          .van-icon-append{
+            
+          }
+        }
+      }
+    }
+  }
+  .global-tabs {
+    background: #ffc803;
+  }
+  map {
+    width: 100%;
+    height: 600rpx;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+<script>
+  import wepy from 'wepy';
+  import child from '@/components/customize/Location/child';
+  import utilWxs from '../../mixins/joinUrlPath.wxs';
+  export default class Example extends wepy.page {
+    config = {
+      navigationBarTitleText: '加油站地址',
+      navigationBarBackgroundColor: '#ffc803',
+      navigationBarTextStyle: 'black'
+      // "backgroundColor": "#e6ac01",
+      // "backgroundTextStyle": "dark"
+    };
+    components = {
+      child: child,
+    };
+    wxs = {
+      utilWxs: utilWxs
+    }
+    data = {
+      loading: false,
+      tabsitemsActive: 0,
+      tabsitems: ['中石化', '中石油', '其他'],
+      latitude: 0, //22.949858
+      longitude: 0, //113.888032
+      scale:14,
+      scrollTop:'0rpx',
+      markers: [],
+      includePoints:[],
+      polygons: [],
+      scrollViewHeight: 0,
+      mapsArrays: []
+    };
+    components = {};
+    methods = {
+      onChange(event) {
+        wx.showToast({
+          title: `切换到标签 ${event.detail.index + 1}`,
+          icon: 'none'
+        });
+      },
+      maptap(event) {
+        console.log('地图点击事件', event);
+      },
+      bindupdated(event) {
+        //console.log('在地图渲染更新完成时触发', event);
+      },
+      tabsTap(e) {
+        this.tabsitemsActive = e.target.dataset.index;
+        console.log('当前index下标值', this.tabsitemsActive);
+      },
+      customTap(index){
+        this.moveToMarker(index);
+      },
+      //使用微信内置地图发开地理位置
+      openLocationByClick(index) {
+        console.log('传入的参数', index);
+        let res = this.mapsArrays[index];
+        wepy.openLocation({
+          latitude: Number(res.latitude), //纬度，范围为-90~90，负数表示南纬,
+          longitude: Number(res.longitude), //经度，范围为-180~180，负数表示西经,
+          scale: 18, //缩放比例，范围5~18,
+          name: res.name, //位置名,
+          address: res.address, //地址的详细说明,
+          success: res => {}
+        });
+      },
+      //绑定点击起泡返回的东西 会返回marker的id
+      callouttap(e){
+        //console.log('callouttap返回的markerid',e)
+      },
+      //绑定点击marker的点击事件
+      markertap(e){
+       // console.log('markertap返回的markerid',e)
+        this.moveToMarker(e.markerId);
+      }
+    };
+    events = {};
+    watch = {};
+    computed = {};
+
+    moveToMarker(index){
+      let location = this.markers.find(item => item.id == index);
+      console.log('返回定位',location);
+      this.longitude = location.longitude;
+      this.latitude = location.latitude;
+      this.scale = 18;
+      //this.scale = 16;
+
+      let query = wepy.createSelectorQuery();
+      query.selectAll('.flex-custom').boundingClientRect();
+      query.exec((res) => {
+        let _height = 0;
+        let _arr = res[0];
+        for (let i = 0; i < _arr.length; i++) {
+          const element = _arr[i];
+          if(i < index){
+            _height += Number(element.height);
+          }
+        }
+        console.log('当前',_height);
+        this.scrollTop = _height;
+        this.$apply();
+      });
+
+      
+    }
+    async initMapSource() {
+
+      let tempPoints = await this.getPoints();
+    
+      this.mapsArrays = tempPoints;
+      //开始创建maker对象
+      const _iconPath = '/images/location.png';
+      let tmepMakkers = [];
+      for (let index = 0; index < tempPoints.length; index++) {
+        const element = tempPoints[index];
+        let obj = {
+          id:index,
+          latitude:element.latitude,
+          longitude:element.longitude,
+          iconPath:_iconPath,
+          callout:{ 
+             content: element.name,
+             color: "#000000",
+             fontSize: "16", 
+             borderRadius: "10",
+             bgColor: "#ffffff",
+             padding: "10",
+             display:"BYCLICK"
+          },
+          // label:{ 
+          //    content: element.name,
+          //    color: "#fe0000",
+          //    fontSize: "16", 
+          //    borderRadius: "10",
+          //    bgColor: "#000000",
+          //    padding: "3",
+          // },
+        }
+        tmepMakkers.push(obj)
+      }
+
+      this.markers = tmepMakkers;
+      this.includePoints = tmepMakkers;
+    
+      //更新状态
+      this.loading = true;
+
+      this.$apply();
+
+    }
+
+    onReady(e){
+      console.log('准备完毕',e);
+      this.mapCtx = wepy.createMapContext('myMap');
+    }
+    onShow() {
+      console.log('数据变了');
+      console.log('onShow');
+      if(this.loading){
+        console.log('数据变了2');
+        this.initMapSource();
+      }
+      
+    }
+    async onLoad() {
+      console.log('onload')
+      const msg = wepy.getSystemInfoSync().windowHeight;
+      const query = wepy.createSelectorQuery();
+      let headerHeight = 0,
+        mapHeight = 0,
+        self = this;
+      query.select('#header').boundingClientRect();
+      query.select('#myMap').boundingClientRect();
+      query.exec((res) => {
+        headerHeight = res[0].height;
+        mapHeight = res[1].height;
+        this.scrollViewHeight = msg - headerHeight - mapHeight;
+        this.$apply();
+        // console.log('当前页面的值为,', this.scrollViewHeight);
+      });
+      const location = await wepy.getLocation({
+        type: 'gcj02' //默认为 wgs84 返回 gps 坐标，gcj02 返回可用于wepy.openLocation的坐标,
+      }).catch(function(data) {
+        if (data.errMsg.match('getLocation:fail auth')) {
+          wx.showModal({
+            title: '温馨提示',
+            content: '系统需要获取你的地理位置来完成定位操作',
+            success: (res) => {
+              console.log('用户未授权');
+              if (res.confirm) {
+                wepy.openSetting();
+                // 打开用户设置
+              } else {
+                console.log('用户点击取消');
+              }
+            }
+          })
+        } else {
+          wepy
+            .showModal({
+              title: '温馨提示',
+              content: '请确保GPS已打开'
+            })
+            .then(res => {
+              console.log('未打开GPS');
+            });
+        }
+      });
+      this.longitude = location.longitude;
+      this.latitude = location.latitude;
+
+      this.initMapSource();
+      this.$apply();
+
+      
+    }
+    // resetAuthorize(){
+    //   wepy.openSetting()
+    //   .then((res)=> {
+    //     console.log(res.authSetting)
+    //     // res.authSetting = {
+    //     //   "scope.userInfo": true,
+    //     //   "scope.userLocation": true
+    //     // }
+    //     wepy.authorize({
+    //       scope: 'scope.userLocation',
+    //     })
+    //     .then(()=>{
+    //       console.log('重新授权成功');
+    //       this.getLoction();
+    //     })
+    //     .catch((err)=>{
+    //       console.log('用户拒绝授权',err);
+    //     })
+    //   })
+    // }
+    async getPoints() {
+      try {
+        let params = {
+          url: 'http://119.29.177.85:3000' + '/api/maps/info',
+          method: 'POST'
+          //dataType: 'json' //如果设为json，会尝试对返回的数据做一次 JSON.parse
+        };
+        let res = await wepy.request(params);
+        //console.log('请求结果',res.data.data);
+        if (res.statusCode == 200) {
+          return res.data.data;
+        }
+      } catch (error) {
+        return []
+      }
+    }
+  }
+</script>
+

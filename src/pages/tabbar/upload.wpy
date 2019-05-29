@@ -1,0 +1,169 @@
+<!--  -->
+<template>
+  
+    <view class='container'>
+        <van-cell-group>
+          <van-field
+              value="{{ name }}"
+              center
+              clearable
+              label="地址位置"
+              placeholder="点击按钮获取地理位置"
+              border="{{ false }}"
+              error ="{{ name == '' ? true : false }}"
+              use-button-slot
+          >
+              <van-button slot="button" size="small" type="primary" @tap="minxinsTap">获取地理位置</van-button>
+          </van-field>
+          </van-cell-group>
+        <ckb1 @customCheckbox.user="ckbFn1"></ckb1>
+        <ckb2 :title="ckb2_name" @customCheckbox.user="ckbFn2"></ckb2>
+        <ckb3 :title="ckb3_name" :weeks="ckb3_week" @customCheckbox.user="ckbFn3"></ckb3>
+        <view class="section_gap section_gap_clear">
+            <text class="section__title section__title_clear section__title__wrap">上传图片(优惠图片)</text> 
+            <avatar :isAvatar="isAvatar" @onUploadEnd.user="avatarCB"></avatar> 
+        </view>
+        <view class="section_gap">
+            <text class="section__title section__title__wrap">优惠金额:(请注意优惠单位为分！)</text>
+            <view class="body-view">
+                <slider @change="slider3change" max="100" min="0" step="10" show-value> </slider>
+            </view>
+        </view>
+        <view  class="section_gap">
+          <van-button size="large" type="primary" @click="formSubmit" >提交数据</van-button>
+        </view>
+      </view>
+    
+    
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import customCheckbox  from '@/components/customize/Panel/customCheckbox';
+  import avatar  from '@/components/customize/Avatar/Avatar';
+  import minxinsAds from '@/mixins/mixinsAddress.js';
+  export default class report extends wepy.page {
+    config = {
+      navigationBarTitleText: "上报位置",
+    };
+
+    data = {
+        latitude:'',
+        longitude:'',
+        price:0,
+        ckb2_name:'95优惠日期',
+        ckb3_name:'加油站类型',
+        ckb3_week:["中石化","中石油","其他"],
+        ckb1_arr:'',
+        ckb2_arr:'',
+        ckb3_arr:'',
+        isAvatar:true,
+        discount:0,
+        images:'',
+        loadingStatus:true, // 按钮加载状态==
+        tags:'',
+        
+    };
+
+    components = {
+        ckb1:customCheckbox,
+        ckb2:customCheckbox,
+        ckb3:customCheckbox,
+        avatar:avatar
+    };
+
+    mixins = [minxinsAds]
+
+    methods = {
+        ckbFn1(res,event){
+            console.log('这是子组件自定义事件发出的',res);
+            this.ckb1_arr = res.join();
+        },
+        ckbFn2(res,event){
+            console.log('这是子组件自定义2事件发出的',res);
+            this.ckb2_arr = res.join();
+        },
+        ckbFn3(res,event){
+            console.log('这是子组件自定义3事件发出的',res);
+            this.tags = res.join();
+        },
+        avatarCB(res){
+          console.log('这是上传完之后返回的图片数据',res);
+          if(res[0] != "只支持png和jpg格式图片"){
+            this.images = res;
+            console.log('成功上传');
+          }
+          
+         
+        },
+        slider3change(e){
+          console.log('slider' + 'index' + '发生 change 事件，携带值为', e.detail.value)
+          this.discount = e.detail.value;
+        },
+        async formSubmit(){
+          console.log('点击上传按钮了',)
+          let postData = {
+            name:this.name,
+            address:this.address,
+            longitude:this.longitude,
+            latitude:this.latitude,
+            coordinate_axes:this.longitude+","+this.latitude,
+            discount:this.discount,
+            number_92:this.ckb1_arr,
+            number_95:this.ckb2_arr,
+            tags:this.tags,
+            images:this.images.length > 0 && this.images.join(),
+            head_images:this.images[0]
+          }
+          try {
+            let res = await wepy.request({
+              url: 'http://119.29.177.85:3000' + '/api/maps/add', //开发者服务器接口地址",//wepy.$instance.globalData.apiUrl
+              data: postData, //请求的参数",
+              method: 'POST',
+              dataType: 'json', //如果设为json，会尝试对返回的数据做一次 JSON.parse
+            });
+            console.log(res)
+            if(res.data != undefined){
+               console.log('上传成功');
+                wx.showToast({
+                  title: '资料上传成功', //提示的内容,
+                  icon: 'success', //图标,
+                  duration: 2000, //延迟时间,
+                  mask: true, //显示透明蒙层，防止触摸穿透,
+                  success: res => {
+                    wepy.switchTab({
+                      url:'/pages/tabbar/location'
+                    })
+                  }
+                });
+                
+            }
+          } catch (error) {
+            console.log('上传失败');
+          }
+        }
+    };
+  }
+</script>
+
+<style lang='less'>
+    .container{
+      .section_gap{
+         padding: 15px;
+         box-shadow: 0 1px #f6f6f6;
+         &_clear{
+           padding: 0 !important;
+         }
+        .section__title{
+          font-size: 14px;
+          &_clear{
+            padding: 0 15px;
+          }
+        }
+        .section__title.section__title__wrap{
+          padding-bottom: 15px;
+          display:block;
+        }
+      }
+    }
+</style>

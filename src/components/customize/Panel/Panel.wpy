@@ -1,0 +1,198 @@
+<!--  -->
+<template>
+  <view class='container'>
+     <!-- 地理位置 -->
+    <view class="container-location">
+        <slot name="location"></slot>
+        <view class="open-panel">
+          <repeat for="{{title}}" key="index" index="index" item="item">
+              <text @tap="onPanelEvent" :class="{active:IsTabActive == index}" data-index="{{index}}">{{item}}</text>   
+          </repeat>
+        </view>
+    </view>
+    <!-- 数据列表面板 -->
+    <view class="container-panel">
+        <repeat for="{{subjects}}" key="index" index="index" item="item">
+            <view class="item">
+              <view class="item-module-image">
+                  <image src="{{item.images['small']}}" mode="aspectFill"
+                    lazy-load="true" >
+                  </image>
+              </view>
+              <view class="item-module-textarea">
+                  <text class="title">{{item.title}}</text>
+                  <view class="icons">
+                      <icon type="success_no_circle" size="18">
+                      </icon>
+                  </view>
+                  <text class="">明天上映 213人想看</text>
+                  <text>{{item.genres}}</text>
+              </view>
+              <view class="item-module-content">
+                <!-- <van-button round type="danger" custom-class="class1" size="large">圆形按钮</van-button> -->
+                <button class="default-btn class1">{{item.subtype}}</button> 
+              </view>
+          </view>
+        </repeat>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  export default class Panel extends wepy.component {
+    props = {
+      title:{
+        type:Array,
+        default:["热映","即映"]
+      }
+    };
+
+    data = {
+      IsTabActive:0,
+      subjects:[]
+    };
+
+    components = {};
+
+    methods = {
+      onPanelEvent(e){
+        console.log('当前点击的',e);
+        this.IsTabActive = e.target.dataset.index;
+        
+      }
+    };
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() {
+      //this.initDataSource();  
+    };
+
+    onShow() {
+      
+     
+    };
+
+    async initDataSource(){
+      try {
+        let url = "http://localhost:5200/movie/in_theaters";
+        let result = await wepy.request({
+          url: url, //开发者服务器接口地址",
+          method: 'GET',
+        });
+        if(result.data.count > 0){
+          //有数据
+          this.subjects = result.data.subjects;
+          this.$apply();
+        }
+       
+      } catch (error) {
+        console.log('出现错误',error);
+      }
+      
+    }
+    
+  }
+</script>
+
+<style lang='less' scoped>
+    .container{
+      &-location{
+        padding: 20rpx;
+        font-size: 26rpx;
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        align-items: center;
+        
+        .open-panel{
+          font-size: 32rpx;
+          color:#000;
+          text{
+            padding: 0 20rpx;
+            &.active{
+              color: red;
+              position: relative;
+              &::after{
+                content: "";
+                position: absolute;
+                top:60rpx;
+                left: 0;
+                width:100%;
+                height:1px;
+                background-color: red;
+              }
+            }
+          }
+         
+        }
+      }
+
+      &-panel{
+        padding: 16rpx 0;
+        margin: 0 20rpx;
+        .item{
+          display: flex;
+          padding-bottom: 10rpx;
+          margin-bottom:10rpx;
+          border-bottom: 1rpx solid #f8f8f8;
+
+          &-module-image{
+            width:134rpx;
+            height:192rpx;
+            flex: 0 0 ;
+            image{
+              max-width:100%;
+              display:block;
+              height:inherit;
+            }
+          }
+          &-module-textarea{
+            padding:20rpx 30rpx 0;
+            font-size: 22rpx;
+            color: #888;
+            flex-grow:1;
+            .title{
+              color: #000;
+              font-size: 32rpx;
+            }
+            text{
+              margin-bottom: 15rpx;
+              display: block;
+            }
+            .title,.icons{
+              margin-bottom: 0;
+            }
+          }
+
+          &-module-content{
+            display: flex;
+            align-content: center;
+            align-items: center;
+            .default-btn{
+              width: 134rpx;
+              border-radius: 50rpx;
+              font-size: 32rpx;
+              height: 70rpx;
+              padding: 5rpx 15rpx;
+              line-height: 60rpx;
+              &.class1{
+                color: #ffffff;
+                background-color: orange;
+                border-color: orange;
+              }
+            }
+           
+
+          }
+        }
+      }
+
+      
+    }
+</style>

@@ -1,0 +1,56 @@
+<!--  -->
+<template>
+    <view class="container-location">
+        <view class="open-location">
+            <van-icon name="location-o" size="28rpx" />
+            <label class="location-text">东莞国贸城</label>
+        </view>
+    </view>
+</template>
+<script>
+  import wepy from 'wepy';
+  export default class Example extends wepy.component {
+    props = {};
+
+    data = {};
+
+    components = {};
+
+    methods = {};
+
+    events = {};
+
+    watch = {};
+
+    computed = {};
+
+    onLoad() { };
+
+    onShow() { };
+  }
+</script>
+<style lang="less" scoped>
+    .container-location{
+        padding: 20rpx;
+        font-size: 26rpx;
+        .open-location{
+            color:#333;
+            .location-text{
+            padding-left: 14rpx;
+            position: relative;
+                &::after{
+                    content: "";
+                    position: absolute;
+                    width: 0;
+                    height: 0;
+                    right: -26rpx;
+                    top:10rpx;
+                    border-left: 8rpx solid transparent;
+                    border-right: 8rpx solid transparent;
+                    border-top: 16rpx solid #888;
+                }
+            }
+        }
+    }
+    
+</style>

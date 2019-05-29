@@ -1,0 +1,59 @@
+<!--  -->
+<template>
+    <view class="tab-component">
+        <view class="tab-component-title">{{propDatas.title}}</view>
+        <view class="tab-component-context">
+            <repeat for="{{propDatas.list}}" key="index" index="index" item="item">
+                <view class="item" @tap="handToChoice({{item.path}})">
+                    <view class="icon">
+                        <van-icon name="{{item.icon}}" size="{{propDatas.size}}" ></van-icon>
+                    </view>
+                    <view class="async-label">
+                        <label>{{item.text}}</label>
+                    </view>
+                </view>
+            </repeat>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Example extends wepy.component {
+  props = {
+    propDatas:Object
+  };
+
+  methods = {
+    handToChoice(url){
+      wepy.navigateTo({ url: url });
+    }
+  }
+  onLoad(){
+
+      console.log('加载事件',this);
+  }
+}
+</script>
+
+<style lang='less'>
+.tab-component {
+  margin-bottom: 40rpx;
+  &-title {
+    font-size: 30rpx;
+    color: #000;
+    font-weight: bold;
+  }
+  &-context {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20rpx;
+    font-size: 24rpx;
+    .item {
+      text-align: center;
+      margin: 0px auto;
+      color: #000;
+    }
+  }
+}
+</style>
